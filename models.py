@@ -14,8 +14,6 @@ from sqlalchemy import  ForeignKey
 from sqlalchemy.orm import relationship
 
 
-Base = declarative_base()
-
 class Actor(Base):
     __tablename__ = 'actors'
 
@@ -23,6 +21,11 @@ class Actor(Base):
     caller_type = Column(String)
     email = Column(String)
     profile_id = Column(String)
+
+    def __init__(self, caller_type, email, profile_id):
+        self.caller_type = caller_type
+        self.email = email
+        self.profile_id = profile_id
 
 class Event(Base):
     __tablename__ = 'events'
@@ -32,6 +35,12 @@ class Event(Base):
     name = Column(String)
     activity_id = Column(Integer, ForeignKey('activities.id'))
     parameters = Column(JSON)
+
+    def __init__(self, type, name, activity_id, parameters=None):
+        self.type = type
+        self.name = name
+        self.activity_id = activity_id
+        self.parameters = parameters
 
 class Activity(Base):
     __tablename__ = 'activities'
@@ -46,5 +55,13 @@ class Activity(Base):
 
     actor = relationship('Actor', back_populates='activities')
     events = relationship('Event', back_populates='activity')
+
+    def __init__(self, time, unique_qualifier, application_name, customer_id, actor_id, ip_address):
+        self.time = time
+        self.unique_qualifier = unique_qualifier
+        self.application_name = application_name
+        self.customer_id = customer_id
+        self.actor_id = actor_id
+        self.ip_address = ip_address
 
 
