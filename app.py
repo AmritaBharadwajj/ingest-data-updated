@@ -111,16 +111,32 @@ with app.app_context():
     db.create_all()
 
 # Create and store objects
-actor = Actor(caller_type='user', email='user@example.com', profile_id='123')
-db.session.add(actor)
+ for item in activities:
+        actor_data = item.get("actor", {})
+        actor = Actor(
+            caller_type=actor_data.get("callerType"),
+            email=actor_data.get("email"),
+            profile_id=actor_data.get("profileId")
+        )
 
-event = Event(type='some_event_type', name='Event Name', activity_id=1, parameters={'key': 'value'})
-db.session.add(event)
+        activity_data = item.get("id", {})
+        activity = Activity(
+            time=datetime.fromisoformat(activity_data.get("time")),
+            unique_qualifier=activity_data.get("uniqueQualifier"),
+            application_name=activity_data.get("applicationName"),
+            customer_id=activity_data.get("customerId"),
+            actor=actor,
+            ip_address=item.get("ipAddress")
+        )
 
-activity = Activity(time=datetime.now(), unique_qualifier='unique', application_name='My App', customer_id='456', actor_id=1, ip_address='127.0.0.1')
-db.session.add(activity)
-
-db.session.commit()
+        events_data = item.get("events", [])
+        for event_data in events_data:
+            event = Event(
+                type=event_data.get("type"),
+                name=event_data.get("name"),
+                activity=activity,
+                parameters=json.dumps(event_data.get("parameters"))
+            )
 
 
 
